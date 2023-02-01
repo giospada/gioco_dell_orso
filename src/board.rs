@@ -35,8 +35,8 @@ impl Board {
             vec![18, 17, 19],
         ]
     }
-    pub fn reaceble(&self, hash: u64, bear_turn: bool) -> Vec<u64> {
-        let State { hunter, bear } = State::from_hash_to_pos(hash);
+    pub fn reaceble_state(&self, state: State, bear_turn: bool) -> Vec<u64> {
+        let State { hunter, bear } = state;
         let mut res = vec![];
         if !bear_turn {
             let mut hunter_copy = hunter.clone();
@@ -63,6 +63,9 @@ impl Board {
             }
         }
         res
+    }
+    pub fn reaceble(&self, hash: u64, bear_turn: bool) -> Vec<u64> {
+        self.reaceble_state(State::from_hash_to_pos(hash), bear_turn)
     }
 }
 #[test]

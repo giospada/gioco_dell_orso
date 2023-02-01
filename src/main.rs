@@ -10,25 +10,55 @@ const HUNTER_IND: usize = 0;
 const BEAR_IND: usize = 1;
 
 fn main() {
-    use std::io::Read;
-    let mut stdin = std::io::stdin();
+    let stdin = std::io::stdin();
 
     let mut sim = Simulation::start_state();
     sim.run_simulation();
 
-    // println!("start state:{}", State::from_pos_to_hash([0, 1, 2], 20));
-    // //sto scrivendo un prompt per giocarci interattivamente conro l'orso
-    // loop {
-    //     let mut buf = String::new();
-    //     match stdin.read_line(&mut buf) {
-    //         Err(_) => break,
-    //         Ok(_) => {}
-    //     }
-    //     if buf == "quit" {
-    //         break;
-    //     }
-    //     println!("enter to continue");
-    // }
+    let mut current_state = State {
+        hunter: [0, 1, 2],
+        bear: 20,
+    };
+    //sto scrivendo un prompt per giocarci interattivamente conro l'orso
+    let mut bear_trun = false;
+    let b = Board::new();
+    loop {
+        current_state.display();
+        let mut buf = String::new();
+        println!("mosse disponibili:");
+        let next_state = b.reaceble_state(current_state.clone(), bear_trun);
+        let mut best = 0;
+        let mut best_val = u32::MAX;
+        for (index, hash) in next_state.iter().enumerate() {
+            let value = sim.end_state[if !bear_trun { BEAR_IND } else { HUNTER_IND }][hash];
+            if value < best_val {
+                best_val = value;
+                best = index;
+            }
+            println!(
+                "{} : {:?}, hunter win in {} moves",
+                index,
+                State::from_hash_to_pos(*hash),
+                value
+            );
+        }
+        println!("scrivi il numero della mossa che vuoi fare o b per best (quit per uscire):");
+        match stdin.read_line(&mut buf) {
+            Err(_) => break,
+            Ok(_) => {}
+        }
+        if buf.trim() == "quit" {
+            break;
+        }
+        if buf.trim() == "b" {
+            current_state = State::from_hash_to_pos(next_state[best]);
+        } else {
+            let ind = buf.trim().parse::<usize>().unwrap();
+            current_state = State::from_hash_to_pos(next_state[ind]);
+        }
+        bear_trun = !bear_trun;
+        println!("enter to continue");
+    }
 }
 
 struct Simulation {

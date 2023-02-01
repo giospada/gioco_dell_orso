@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct State {
     pub hunter: [u32; 3],
     pub bear: u32,
@@ -34,10 +34,10 @@ impl State {
         res
     }
 
-    pub fn to_hash(self) -> u64 {
+    pub fn to_hash(&self) -> u64 {
         Self::from_pos_to_hash(self.hunter, self.bear)
     }
-    pub fn display(self) {
+    pub fn display(&self) {
         display_position(self.hunter, self.bear);
     }
 }
